@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>21's Typer</title>
+
+    <style>
+        body {
+            background: rgb(34, 33, 33);
+            font-family: Arial, Helvetica, sans-serif;
+            color: rgb(241, 238, 238);
+            font-size: 14px;
+        }
+
+        #topTitle {
+            text-align: center;
+            border: 2px solid rgb(144, 8, 8);
+            border-radius: 4px;
+            padding: 3px;
+        }
+
+        #detail {
+            flex-direction: row;
+            justify-content: space-around;
+            display: none;
+        }
+
+        #challengeWord {
+            margin: 18px 0px;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        #copyright {
+            font-size: 15px;
+            text-align: center;
+            margin-top: 140px;
+            border: 2px solid rgb(144, 8, 8);
+            border-radius: 3px;
+            padding: 4px;
+            font-style: italic;
+        }
+
+        #copyright a {
+            text-decoration: none;
+            color: black;
+            background: white;
+            padding: 3px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+
+        #capsActivated {
+            background: green;
+            width: fit-content;
+            font-size: 18px;
+            padding: 5px;
+            border-radius: 3px;
+            font-weight: bold;
+            margin: 5px;
+            margin-left: 0px;
+            display: none;
+        }
+
+        #reset {
+            border: none;
+            padding: 5px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            background: green;
+            color: white;
+            font-weight: bold;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1 id="topTitle">🌀21's Typer🌀</h1>
+
+    <div id="detail">
+        <div id="time" class="dClass">Time : 21s left</div>
+        <div id="wordLeft" class="dClass"></div>
+    </div>
+
+    <div id="capsActivated">
+    </div>
+
+    <div id="challengeWord">
+
+    </div>
+
+    <div id="copyright">Created by <a href="https://github.com/sajidrec" target="_blank">Sajid (click for github
+            profile)</a></div>
+
+    <script>
+        // select elements and store them on variable
+        const detail = document.getElementById('detail')
+        const challengeWord = document.getElementById('challengeWord')
+        const timeShow = document.getElementById('time')
+        const wordLeft = document.getElementById('wordLeft')
+        const capsActivated = document.getElementById('capsActivated')
+        // const reset = document.getElementById('reset')
+
+        reset = () => {
+            window.location.reload()
+        }
+
+        // word length function
+        const wordLength = (theWord) => {
+            let spaces = 0
+            for (let val of theWord) {
+                if (val == ' ') {
+                    spaces++
+                }
+            }
+            return spaces
+        }
+
+        // capsLock status fucntion
+        const capsLocStatus = () => {
+            if (event.getModifierState('CapsLock')) {
+                capsActivated.innerText = `Caps Lock is on`
+                capsActivated.style.background = 'red'
+            }
+            else {
+                capsActivated.innerText = `Caps Lock is off`
+                capsActivated.style.background = 'green'
+            }
+        }
+
+        // time tracker
+        let timeLeft = 21
+        let timeOff = true
+
+        // word to be typed (type by own hand ;( )
+        const listOfWords = ['sajid', 'hossain', 'play', 'game', 'programming', 'Bangladesh', 'century', 'hobby', 'creative', 'experts', 'memory', 'create', 'football', 'cricket', 'random', 'public', 'private', 'airplane', 'fox', 'lion', 'tiger', 'crow', 'famous', 'generate', 'fifty', 'major', 'general', 'right', 'left', 'night', 'day', 'sunny', 'rainy', 'octopus', 'shark', 'shirt', 'short', 'black', 'red', 'love', 'hate', 'violate', 'return', 'though', 'therefore', 'nothing', 'everything', 'alright', 'this', 'thin', 'thick', 'huge', 'big', 'fan', 'hater', 'mango', 'banana', 'fruits', 'whatever', 'mean', 'max', 'min', 'scarry', 'harmful', 'helpful', 'need', 'back', 'front', 'first', 'fish', 'father', 'mother', 'careful', 'serious', 'seriously', 'better', 'best', 'good', 'among', 'all', 'how', 'much', 'worthy', 'auto', 'integer', 'float', 'value', 'women', 'men', 'gender', 'matter', 'honest', 'dishonest', 'pain', 'painful', 'heart', 'broken', 'sports', 'treasure', 'treatment', 'casual', 'civil', 'war', 'fight', 'grand', 'wisdom', 'cut', 'copy', 'paste', 'pasta', 'pizza', 'chicken', 'cow', 'burger', 'brain', 'hand', 'foot', 'stomach', 'routine', 'safe', 'guard', 'guardian', 'helmet', 'cycle', 'cyclic', 'street', 'guy', 'builder', 'pipe', 'people', 'snow', 'rainy', 'friday', 'monday', 'she', 'he', 'rat', 'mad', 'ok', 'can', 'you', 'me', 'end', 'finish']
+        let cWord = ''
+
+        for (let i = 0; i < 110; i++) {
+            let selectedWord = listOfWords[Math.floor(Math.random() * listOfWords.length)]
+            if (Math.floor(Math.random() * 2)) {
+                selectedWord = selectedWord[0].toUpperCase() + selectedWord.slice(1)
+            }
+            cWord += selectedWord
+            cWord += ' '
+        }
+
+        wordLeft.innerText = `Words 0/${wordLength(cWord)}`
+
+        challengeWord.innerText = cWord
+
+        // variable for current position and word typed and key type tracker
+        let curPosition = 0, wordsTyped = 0, wrongKey = 0, totalKeyPressed = 0
+
+        // time counting mechanism
+        let timeOver = false
+        const timeCount = async () => {
+            const sId =
+                setInterval(() => {
+                    timeLeft--
+                    if (!timeLeft) {
+                        stopTimer(sId)
+                    }
+                    timeShow.innerText = `Time : ${timeLeft}s left`
+                }, 1000);
+        }
+
+        const stopTimer = (sId) => {
+            clearInterval(sId)
+            timeOver = true;
+            challengeWord.innerHTML = `<h3>You've typed ${wordsTyped} words in 21 seconds<br>and ${wrongKey} wrong keypress and total ${totalKeyPressed} key was pressed</h3><br><button id=reset onclick = 'reset()'>Type again</button>`
+        }
+
+        // update challenge word
+        const updateChallengeWord = (curentPosition) => {
+            challengeWord.innerText = cWord.slice(curPosition, cWord.length)
+        }
+
+
+
+        // event listener on key press
+
+        document.addEventListener(
+            'keydown', (e) => {
+                if (!timeOver) {
+                    capsLocStatus()
+                    capsActivated.style.display = 'block'
+                    detail.style.display = 'flex'
+
+                    totalKeyPressed++
+
+                    if (timeOff) {
+                        timeOff = false
+                        timeCount()
+                    }
+
+                    if (e.keyCode == 20) {
+                        capsLocStatus()
+                    }
+
+                    if (e.key == cWord[curPosition]) {
+                        curPosition = (curPosition + 1) % (cWord.length)
+                        updateChallengeWord(curPosition)
+                        if (e.keyCode == 32) {
+                            wordsTyped++
+                            wordLeft.innerText = `Words ${wordsTyped}/${wordLength(cWord)}`
+                        }
+                    }
+                    else if ((e.key >= 'a' && e.key <= 'z') || e.keyCode == 32 || (e.key >= 'A' && e.key <= 'Z')) {
+                        wrongKey++;
+                    }
+
+                }
+            }
+        )
+
+    </script>
+</body>
+
+</html>
